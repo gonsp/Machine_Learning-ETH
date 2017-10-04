@@ -9,10 +9,10 @@ class MRIVisualizer:
 		pass
 
 	def fit(self, X, y):
-		X = check_array(X)
 		I = 176
 		J = 208
 		K = 176
+		X = check_array(X)
 		X = X.reshape(-1, I, J, K)
 
 		id = 0

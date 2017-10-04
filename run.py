@@ -70,7 +70,7 @@ class Action(ABC):
             os.mkdir(normpath(path))
             return path
         else:
-            return None
+            return "tmp/"
 
 
 class ConfigAction(Action):
