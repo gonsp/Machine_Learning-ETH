@@ -7,50 +7,73 @@ I = 176
 J = 208
 K = 176
 
-class Sampler(BaseEstimator, TransformerMixin):
+class MeanTransformer(BaseEstimator, TransformerMixin):
 
-	def __init__(self, n_features=10000, sample_size=2, offset=50, random_state=None):
-		self.n_features = 2*n_features
-		self.sample_size = sample_size
-		self.offset = offset
-		seed(random_state)
+	def __init__(self, box_size=5):
+		self.box_size = box_size
 
 	def fit(self, X, y=None):
 		print("----------")
 		print("Fitting")
 		self.max_value = np.amax(X)
 		print("Max intensity", self.max_value)
-		def generate_pos():
-			i = randint(self.offset, I-self.offset)
-			j = randint(self.offset, J-self.offset)
-			k = randint(self.offset, K-self.offset)
-			return (i, j, k)
-		self.positions = [generate_pos() for _ in range(self.n_features)]
 		return self
 
 	def transform(self, X, y=None):
 		X = check_array(X)
 		X = X.reshape(-1, I, J, K)
 
-		n_elements = X.shape[0]
+		X_new = np.zeros(X.shape) 
 
-		X_new = np.zeros((X.shape[0], self.n_features))
-		for i in range(0, n_elements):
-			print("element", i)
-			for j in range(0, self.n_features, 2):
-				X_new[i][j], X_new[i][j+1] = self.sample(X[i], self.positions[j])/self.max_value
+		for i in range(0, X.shape[0]):
+			print("Computing mean matrix for element", i)
+			self.compute_mean_matrix_3D(X[i], X_new[i])
+			print("Mean matrix computed")
 
 		return X_new
+	
 
-	def sample(self, scan, pos):
-		values = []
-		x, y, z = pos
-		size = self.sample_size
-		for i in range(max(0, x-size), min(I, x+size+1)):
-			for j in range(max(0, y-size), min(J, y+size+1)):
-				for k in range(max(0, z-size), min(K, z+size+1)):
-					values.append(scan[i][j][k])
-		values = np.asarray(values)
-		mean = values.mean()
-		variance = values.var()
-		return (mean, variance)
+	def compute_mean_matrix_3D(self, X, X_new):
+		for i in range(0, X.shape[0]):
+			self.compute_mean_matrix(X[i], X_new[i])
+
+			aux1 = np.rot90(X_new[i], axes=(0, 1))
+			aux2 = np.zeros(aux1.shape)
+
+			self.compute_mean_matrix(aux1, aux2)
+
+			X_new[i] = np.rot90(aux2, axes=(1, 0))
+
+		aux1 = np.rot90(X_new, axes=(0, 2))
+		aux2 = np.zeros(aux1.shape)
+
+		for i in range(0, aux1.shape[0]):
+			self.compute_mean_matrix(aux1[i], aux2[i])
+
+		X_new[:] = np.rot90(aux2, axes=(2, 0))
+
+		for i in range(0, I):
+			for j in range(0, J):
+				for k in range(0, K):
+					length_x = min(I-1, i+self.box_size) - max(0, i-self.box_size) + 1
+					length_y = min(J-1, j+self.box_size) - max(0, j-self.box_size) + 1
+					length_z = min(K-1, k+self.box_size) - max(0, k-self.box_size) + 1
+					X[i][j][k] /= length_x * length_y * length_z
+					x[i][j][k] /= self.max
+
+
+	def compute_mean_matrix(self, X, M):
+		for i in range(0, M.shape[0]):
+			s = np.uint64(0)
+			for j in range(0, self.box_size+1):
+				s += X[i][j]
+			M[i][0] = s
+			
+			for j in range(1, M.shape[1]):
+				old_pos = j - self.box_size - 1
+				if old_pos >= 0:
+					s -= X[i][old_pos]
+				new_pos = j + self.box_size
+				if new_pos < M.shape[1]:
+					s += X[i][new_pos]
+				M[i][j] = s

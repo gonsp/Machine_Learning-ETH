@@ -1,9 +1,10 @@
 import sys
-from sklearn.utils.validation import check_array
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 from matplotlib import pyplot as plt
 import numpy as np
 
-class MRIVisualizer:
+class MRIVisualizer(BaseEstimator, TransformerMixin):
 
 	def __init__(self):
 		pass
@@ -12,8 +13,6 @@ class MRIVisualizer:
 		I = 176
 		J = 208
 		K = 176
-		X = check_array(X)
-		X = X.reshape(-1, I, J, K)
 
 		id = 0
 		height = 100
@@ -50,3 +49,6 @@ class MRIVisualizer:
 				plt.imshow(image, cmap='gray')
 				plt.draw()
 				plt.pause(0.001)
+
+	def transform(self, X, y):
+		pass
