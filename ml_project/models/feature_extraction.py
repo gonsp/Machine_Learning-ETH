@@ -23,17 +23,20 @@ class MeanTransformer(BaseEstimator, TransformerMixin):
 		X = check_array(X)
 		X = X.reshape(-1, I, J, K)
 
-		X_new = np.zeros(X.shape) 
+		X_new = np.zeros(X.shape, dtype=np.uint16) 
 
 		for i in range(0, X.shape[0]):
 			print("Computing mean matrix for element", i)
-			self.compute_mean_matrix_3D(X[i], X_new[i])
+			X_new[i] = self.compute_mean_matrix_3D(X[i])
 			print("Mean matrix computed")
 
+		X_new = X_new.reshape(-1, I*J*K)
 		return X_new
 
 
-	def compute_mean_matrix_3D(self, X, X_new):
+	def compute_mean_matrix_3D(self, X):
+		X_new = np.zeros(X.shape, dtype=np.uint32)
+
 		for i in range(0, X.shape[0]):
 			self.compute_mean_matrix(X[i], X_new[i])
 
@@ -59,12 +62,13 @@ class MeanTransformer(BaseEstimator, TransformerMixin):
 					length_y = min(J-1, j+self.box_size) - max(0, j-self.box_size) + 1
 					length_z = min(K-1, k+self.box_size) - max(0, k-self.box_size) + 1
 					X_new[i][j][k] /= length_x * length_y * length_z # compute the mean
-					X_new[i][j][k] /= self.max_value # normalize
-
+					# X_new[i][j][k] /= self.max_value # normalize
+		
+		return X_new.astype(np.uint16)
 
 	def compute_mean_matrix(self, X, M):
 		for i in range(0, M.shape[0]):
-			s = np.uint64(0)
+			s = np.uint32(0)
 			for j in range(0, self.box_size+1):
 				s += X[i][j]
 			M[i][0] = s
