@@ -58,8 +58,8 @@ class MeanTransformer(BaseEstimator, TransformerMixin):
 					length_x = min(I-1, i+self.box_size) - max(0, i-self.box_size) + 1
 					length_y = min(J-1, j+self.box_size) - max(0, j-self.box_size) + 1
 					length_z = min(K-1, k+self.box_size) - max(0, k-self.box_size) + 1
-					X_new[i][j][k] /= length_x * length_y * length_z  # compute the mean
-					X_new[i][j][k] /= self.max 	# normalize
+					X_new[i][j][k] /= length_x * length_y * length_z # compute the mean
+					X_new[i][j][k] /= self.max_value # normalize
 
 
 	def compute_mean_matrix(self, X, M):
