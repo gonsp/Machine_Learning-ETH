@@ -1,12 +1,13 @@
-import sklearn as skl
 import numpy as np
 import pandas as pd
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+import sklearn as skl
 from matplotlib import pyplot as plt
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 
 class KernelEstimator(skl.base.BaseEstimator, skl.base.TransformerMixin):
     """docstring"""
+
     def __init__(self, save_path=None):
         super(KernelEstimator, self).__init__()
         self.save_path = save_path
@@ -44,7 +45,7 @@ class KernelEstimator(skl.base.BaseEstimator, skl.base.TransformerMixin):
         return prediction
 
     def score(self, X, y, sample_weight=None):
-        scores = (self.predict(X) - y)**2 / len(y)
+        scores = (self.predict(X) - y) ** 2 / len(y)
         score = np.sum(scores)
 
         if self.save_path is not None:

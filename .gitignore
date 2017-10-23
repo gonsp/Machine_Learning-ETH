@@ -5,3 +5,6 @@ __pycache__/
 .kaggle-cli/
 data/
 .config.yaml
+.DS_Store
+.smt/*
+tmp/*

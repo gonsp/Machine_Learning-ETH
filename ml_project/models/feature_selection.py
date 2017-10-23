@@ -1,11 +1,12 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_array, check_is_fitted
 from sklearn.utils.random import sample_without_replacement
+from sklearn.utils.validation import check_array, check_is_fitted
 
 
 class RandomSelection(BaseEstimator, TransformerMixin):
     """Random Selection of features"""
+
     def __init__(self, n_components=1000, random_state=None):
         self.n_components = n_components
         self.random_state = random_state
@@ -17,9 +18,9 @@ class RandomSelection(BaseEstimator, TransformerMixin):
 
         random_state = check_random_state(self.random_state)
         self.components = sample_without_replacement(
-                            n_features,
-                            self.n_components,
-                            random_state=random_state)
+            n_features,
+            self.n_components,
+            random_state=random_state)
         return self
 
     def transform(self, X, y=None):
