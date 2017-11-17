@@ -15,13 +15,17 @@ ETH Machine Learning Projects
 .. _kaggle-cli: https://github.com/floydwch/kaggle-cli
 .. _kaggle: https://inclass.kaggle.com/c/ml-project-1
 .. _`Kaggle Project 1`: https://inclass.kaggle.com/c/ml-project-1
+.. _`Kaggle Project 2`: https://www.kaggle.com/c/ml-project-2
 .. _runner: run.py
 .. _regression: ml_project/models/regression.py
 .. _`feature selection`: ml_project/models/feature_selection.py
 .. _models: ml_project/models
 .. _`.environment`: .environment
 .. _`request access`: https://docs.gitlab.com/ee/user/project/members/index.html#request-access-to-a-project
-.. _`invite link`: https://www.kaggle.com/t/4e959a86df6a450ea3dad585f71f67d1
+.. _`invite link 1`: https://www.kaggle.com/t/4e959a86df6a450ea3dad585f71f67d1
+.. _`invite link 2`: https://www.kaggle.com/t/db8d6e93b6ff4efba65481d4d9b53297
+.. _`More information`: https://drive.google.com/open?id=1UM_osCot4MomlPQu-G83LHt721nSyIJG5t6rO_yLOZU
+.. _`General Project Information`: https://drive.google.com/open?id=1NvAqcPzgnTIflpG6BzeAt3dSUlu1JlYJ_2BsQVab6pI
 
 This repository contains the *Python 3.5.3* framework for the practical projects offered
 during the *Machine Learning* course at ETH Zurich. It serves two main purposes:
@@ -30,10 +34,11 @@ during the *Machine Learning* course at ETH Zurich. It serves two main purposes:
 2. Structured & reproducible experiments by integration of sumatra_ and miniconda_.
 
 
-The project description and result submission are hosted by Kaggle:
+The project description and result submission are hosted by Kaggle: 
 
-- `Kaggle Project 1`_ (`invite link`_)
-
+- `General Project Information`_
+- `Kaggle Project 1`_ (`invite link 1`_)
+- `Kaggle Project 2`_ (`invite link 2`_)
 
 .. contents::
 
@@ -61,16 +66,21 @@ Ok, now we understand the code and the experiment setup. So let's run their code
 
 Sounds familiar? Don't worry, miniconda_ is a central part of the framework, which provides your code an isolated, functional environment to run.
 
+`More information`_ on how the framework functions.
+
 Getting Started
 ===============
 
 Get Started (Non-Linux)
 -----------------------
 
-The project framework has been tested in Linux (Ubuntu) environments only. If you
-are using Linux already, you can skip forward to Getting Started for Linux.
+The project framework has been tested mainly in Linux (Ubuntu) environments. If you
+are using Linux already, you can skip forward to Get Started for Linux.
 
-If you are using Mac or Windows, please install VirtualBox_ and create an 64-bit Ubuntu_
+The framework should also work on OS X, but it has not been tested extensively.
+OS X users may choose to skip forward to Get started for Linux and OS X.
+
+If you are using Windows, you need to install VirtualBox_ and create an 64-bit Ubuntu_
 virtual machine (VM).
 
 Make sure you allocate sufficient RAM (>= 8GB) and disk space (>= 64GB) for the VM.
@@ -82,11 +92,11 @@ Once your VM is running, open a terminal and install git:
 
 .. code-block:: shell
 
-    sudo aptitude install git
+    sudo apt-get install git
 
 After that, please continue with Getting Started for Linux.
 
-Get Started (Linux)
+Get Started (Linux and OS X)
 -------------------
 
 First you need to install miniconda_ on your system. If you already have Anaconda
@@ -109,7 +119,7 @@ Make sure the environment is activated:
 .. code-block:: shell
 
     source activate ml_project
-
+    
 If you encounter problems with site-packages try:
 
 .. code-block:: shell
@@ -136,12 +146,6 @@ Make sure the environment is activated:
 .. code-block:: shell
 
     source activate ml_project
-
-If you encounter problems with site-packages try:
-
-.. code-block:: shell
-
-    export PYTHONNOUSERSITE=True; source activate ml_project
 
 Make sure you have downloaded the data to the data_ folder, either by using the
 kaggle-cli_ tool or from the kaggle_ homepage.

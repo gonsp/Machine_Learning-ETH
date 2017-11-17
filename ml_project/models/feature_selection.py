@@ -4,6 +4,20 @@ from sklearn.utils.random import sample_without_replacement
 from sklearn.utils.validation import check_array, check_is_fitted
 
 
+class NonZeroSelection(BaseEstimator, TransformerMixin):
+    """Select non-zero voxels"""
+    def fit(self, X, y=None):
+        X = check_array(X)
+        self.nonzero = X.sum(axis=0) > 0
+
+        return self
+
+    def transform(self, X, y=None):
+        check_is_fitted(self, ["nonzero"])
+        X = check_array(X)
+        return X[:, self.nonzero]
+
+
 class RandomSelection(BaseEstimator, TransformerMixin):
     """Random Selection of features"""
 
