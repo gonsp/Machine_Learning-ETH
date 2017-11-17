@@ -57,3 +57,75 @@ params:
 #      n_splits: 3
 #      shuffle: True
 #      random_state: 37
+
+
+
+# module: ml_project.pipeline
+# class: Pipeline
+# params:
+#   class_list:
+#   - module: ml_project.models.feature_selection
+#     class: RandomSelection
+#     params:
+#       n_components: 200000
+#   - module: sklearn.linear_model
+#     class: LinearRegression
+
+
+# module: ml_project.models.data_reduction
+# class: HistogramExtractor
+# params:
+#   offset: 10
+
+module: ml_project.models.utils
+class: MRIVisualizer
+
+
+# module: ml_project.model_selection
+# class: GridSearchCV
+# params:
+#   est_module: ml_project.pipeline
+#   est_class: Pipeline
+#   est_params:
+#     - module: ml_project.models.feature_selection
+#       class: RandomSelection
+#       params:
+#         random_state: 37
+#     - module: sklearn.kernel_ridge
+#       class: KernelRidge
+#       params:
+#         kernel: "polynomial"
+#   param_grid:
+#     RandomSelection__n_components: [30000, 50000, 60000]
+#     KernelRidge__degree: [5]
+#   cv:
+#     module: sklearn.model_selection
+#     class: KFold
+#     params:
+#       n_splits: 3
+#       shuffle: True
+#       random_state: 37
+
+# module: ml_project.model_selection
+# class: GridSearchCV
+# params:
+#   est_module: ml_project.pipeline
+#   est_class: Pipeline
+#   est_params:
+#     - module: ml_project.models.feature_selection
+#       class: RandomSelection
+#       params:
+#         random_state: 37
+#     - module: sklearn.preprocessing
+#       class: PolynomialFeatures
+#     - module: sklearn.linear_model
+#       class: LinearRegression
+#   param_grid:
+#     RandomSelection__n_components: [10000]
+#   cv:
+#     module: sklearn.model_selection
+#     class: KFold
+#     params:
+#       n_splits: 3
+#       shuffle: True
+#       random_state: 37

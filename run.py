@@ -66,13 +66,13 @@ class Action(ABC):
         return X, y
 
     def _mk_save_folder(self):
-        if self.args.smt_label != "debug":
+        if self.args.smt_label == "tmp":
+            return "tmp/"
+        elif self.args.smt_label != "debug":
             basename = self.args.smt_label
             path = "data/"+basename+"/"
             os.mkdir(normpath(path))
             return path
-        else:
-            return "tmp/"
 
     def transform(self):
         if "y" in getfullargspec(self.model.transform).args:
