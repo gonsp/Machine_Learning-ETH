@@ -7,6 +7,45 @@ J = 208
 K = 176
 
 
+class HistogramGenerator(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        X = check_array(X)
+        return self
+
+    def transform(self, X, y=None):
+        # Data Selection
+        trainData = np.reshape(X, (-1, I, J, K))
+        trainData = np.asarray(trainData)
+        selectedData = trainData[:, 17:157, 20:190, 45:145]
+        print("Selected Data Size: " + str(selectedData.shape))
+
+        # Generate histograms for cubes (10*10*10 cubes) for Training
+        print("Generating histograms...\n")
+        histStack = []
+        for i_sample in range(0, selectedData.shape[0]):
+            print("Histogram of MRI:", i_sample)
+            histSubStack = []
+            for x in range(0, 10):
+                for y in range(0, 10):
+                    for z in range(0, 10):
+                        cube = selectedData[i_sample,
+                                            14*x:14*(x+1),
+                                            17*y:17*(y+1),
+                                            10*z:10*(z+1)]
+                        hist, bin_edges = np.histogram(cube, bins=50)
+                        hist = hist.reshape(-1, 1)
+                        histSubStack = np.append(histSubStack, hist)
+            histSubStack = histSubStack.reshape(-1, 1)
+            if i_sample == 0:
+                histStack = np.append(histStack, histSubStack).reshape(-1, 1)
+            else:
+                histStack = np.append(histStack, histSubStack, axis=1)
+        histTrainData = histStack.T
+        X_new = histTrainData
+
+        return X_new
+
+
 class MeanTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, box_size=5):
         self.box_size = box_size
