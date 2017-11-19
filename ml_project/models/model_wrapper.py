@@ -1,9 +1,10 @@
 import numpy as np
+from scipy.stats import spearmanr as r
 from ml_project.pipeline import Pipeline
 
 
 class ModelWrapper(Pipeline):
-    def __init__(self, model, save_path=None):
+    def __init__(self, model, ignore=1, save_path=None):
         super(ModelWrapper, self).__init__(model)
 
     def fit(self, X, y=None):
@@ -21,3 +22,8 @@ class ModelWrapper(Pipeline):
         l = list(zip([0.4, 0.3, 0.2, 0.1], label))
         l = sorted(l, key=lambda k: k[1])
         return list(zip(*l))[0]
+
+    def score(self, X, y_prob_true, sample_weight=None):
+        y_prob_pred = self.predict_proba(X)
+        c = [r(y_prob_pred[i], y_prob_true[i]).correlation for i in range(len(y_prob_true))]
+        return np.average(c, weights=sample_weight)
