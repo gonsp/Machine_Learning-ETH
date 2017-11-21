@@ -8,14 +8,17 @@ class ModelWrapper(Pipeline):
         super(ModelWrapper, self).__init__(model)
 
     def fit(self, X, y=None):
-        y_new = np.array(["".join([str(i) for i in np.argsort(-p)]) for p in y])
-        super(ModelWrapper, self).fit(X, y_new)
+        y2 = np.array(["".join([str(i) for i in np.argsort(-p)]) for p in y])
+        super(ModelWrapper, self).fit(X, y2)
         return self
 
     def predict_proba(self, X):
         labels = self._final_estimator.classes_
         y_pred = super(ModelWrapper, self).predict_proba(X)
-        y_sorted = np.array([self.label_to_probability(max(list(zip(labels, p)), key=lambda k: k[1])[0]) for p in y_pred])
+        y_sorted = np.array(
+            [self.label_to_probability(max(list(zip(labels, p)),
+                                           key=lambda k: k[1])[0])
+             for p in y_pred])
         return y_sorted
 
     def label_to_probability(self, label):
@@ -25,5 +28,7 @@ class ModelWrapper(Pipeline):
 
     def score(self, X, y_prob_true, sample_weight=None):
         y_prob_pred = self.predict_proba(X)
-        c = [r(y_prob_pred[i], y_prob_true[i]).correlation for i in range(len(y_prob_true))]
+        c = [r(y_prob_pred[i],
+               y_prob_true[i]).correlation
+             for i in range(len(y_prob_true))]
         return np.average(c, weights=sample_weight)
