@@ -1,4 +1,7 @@
 # Approaching ML Projects
+
+By Stepahnie Hyland
+
 The purpose of this tutorial is to give broad tips for solving the types of problems encountered in the ML projects. This is not to indicate that these tips are magic tricks for solving any particular project, but rather they are suggestions for _how_ to approach these problems.
 
 ## 0. Meta-remarks: The Setting
