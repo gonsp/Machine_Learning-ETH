@@ -112,3 +112,5 @@ Since the ML projects take the format of a Kaggle competition, experiences from 
 More generally: data science and machine learning are rapidly expanding fields, with multitudes of questions on StackExchange and other sites, and informative blog posts and articles (some of which I've included here).
 
 And last but not least: there's always Piazza.
+
+By Stepahnie Hyland
