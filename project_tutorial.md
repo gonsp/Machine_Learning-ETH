@@ -1,6 +1,6 @@
 # Approaching ML Projects
 
-By Stepahnie Hyland
+By Stephanie Hyland
 
 The purpose of this tutorial is to give broad tips for solving the types of problems encountered in the ML projects. This is not to indicate that these tips are magic tricks for solving any particular project, but rather they are suggestions for _how_ to approach these problems.
 
@@ -116,4 +116,4 @@ More generally: data science and machine learning are rapidly expanding fields, 
 
 And last but not least: there's always Piazza.
 
-By Stepahnie Hyland
+By Stephanie Hyland
