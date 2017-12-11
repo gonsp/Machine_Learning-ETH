@@ -2,6 +2,45 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
+
+n_elements = 6822
+n_features = 18286
+
+
+class CardiogramFeatureExtractor():
+    def fit(self, X, y=None):
+        X = check_array(X)
+        return self
+
+    def transform(self, X, y=None):
+        X = X.reshape(n_elements, n_features)
+        X_new = None
+
+        for id in range(0, n_elements):
+            features = self.extract_features(X[id])
+            if X_new is None:
+                X_new = np.zeros((n_elements, len(features)))
+
+            X_new[id] = features
+
+        return X_new
+
+    def extract_features(self, x):
+        x = np.trim_zeros(x)
+        x_new = []
+        X_new.append(self.extract_mean(x))
+        X_new.append(self.extract_variance(x))
+        X_new.append(self.extract_period(x))
+        X_new.append(self.extract_max(x))
+        return list(x_new)
+
+    def extract_mean(self, x):
+        return np.mean(x)
+
+    def extract_variance(self, x):
+        return np.mean(x)
+
+
 I = 176
 J = 208
 K = 176
