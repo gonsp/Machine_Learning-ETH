@@ -51,7 +51,7 @@ class CardiogramFeatureExtractor():
         return np.max(x)
 
     def extract_peaks_pos(self, x):
-        detect_peaks(x, threshold=0, mph=500, mpd=100, edge='both', kpsh=True, show=True)
+        detect_peaks(x, threshold=0, mph=0, mpd=0, edge='both', kpsh=True, show=True)
 
 def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
                  kpsh=False, valley=False, show=False, ax=None):
