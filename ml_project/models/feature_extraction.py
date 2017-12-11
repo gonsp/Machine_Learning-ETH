@@ -28,17 +28,17 @@ class CardiogramFeatureExtractor():
     def extract_features(self, x):
         x = np.trim_zeros(x)
         x_new = []
-        X_new.append(self.extract_mean(x))
-        X_new.append(self.extract_variance(x))
-        X_new.append(self.extract_period(x))
-        X_new.append(self.extract_max(x))
+        x_new.append(self.extract_mean(x))
+        x_new.append(self.extract_variance(x))
+        # x_new.append(self.extract_period(x))
+        # x_new.append(self.extract_max(x))
         return list(x_new)
 
     def extract_mean(self, x):
         return np.mean(x)
 
     def extract_variance(self, x):
-        return np.mean(x)
+        return np.var(x)
 
 
 I = 176
