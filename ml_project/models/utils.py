@@ -1,5 +1,7 @@
 import sys
 
+from ml_project.models.feature_extraction import CardiogramFeatureExtractor, n_elements, n_features
+
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -50,6 +52,59 @@ class MRIVisualizer(BaseEstimator, TransformerMixin):
                 plt.imshow(image, cmap='gray')
                 plt.draw()
                 plt.pause(0.001)
+
+    def transform(self, X, y):
+        pass
+
+class CardiogramVisualizer(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        pass
+
+    def fit(self, X, y):
+        X = X.reshape(n_elements, n_features)
+
+        feature_extractor = CardiogramFeatureExtractor()
+        feature_extractor.fit(X)
+        extracted_features = feature_extractor.transform(X)
+
+        plt.ion()
+        plt.show()
+
+        fig_size = plt.rcParams["figure.figsize"]
+         
+        print("Current size:", fig_size)
+         
+        # Set figure width to 12 and height to 9
+        fig_size[0] = 14
+        fig_size[1] = 5
+        plt.rcParams["figure.figsize"] = fig_size
+
+        first = True
+        id = 0
+        while True:
+            action = True
+
+            if not first:
+                c = sys.stdin.read(1)
+                if c == 'd':
+                    id += 1
+                elif c == 'a':
+                    id -= 1
+                else:
+                    action = False
+
+            first = False
+
+            if action:
+                plt.clf()
+                print("id:", id)
+                print("class: ", y[id])
+                print("features: ", extracted_features[id])
+                plt.plot(np.trim_zeros(X[id]))
+                plt.show()
+                plt.pause(0.001)
+
+
 
     def transform(self, X, y):
         pass
