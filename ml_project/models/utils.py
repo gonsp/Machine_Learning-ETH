@@ -1,5 +1,7 @@
 import sys
 
+from ml_project.models.feature_extraction import CardiogramFeatureExtractor, n_elements, n_features
+
 import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -59,8 +61,6 @@ class CardiogramVisualizer(BaseEstimator, TransformerMixin):
         pass
 
     def fit(self, X, y):
-        n_elements = 6822
-        n_features = 18286
         X = X.reshape(n_elements, n_features)
 
         feature_extractor = CardiogramFeatureExtractor()
@@ -99,7 +99,7 @@ class CardiogramVisualizer(BaseEstimator, TransformerMixin):
                 plt.clf()
                 print("id:", id)
                 print("class: ", y[id])
-                print("features: " extracted_features[id])
+                print("features: ", extracted_features[id])
                 plt.plot(np.trim_zeros(X[id]))
                 plt.show()
                 plt.pause(0.001)
