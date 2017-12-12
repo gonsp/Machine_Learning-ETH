@@ -23,7 +23,7 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
 
         X_new = None
 
-        for id in range(389, n_elements):
+        for id in range(0, n_elements):
             print("id: ", id)
             features = self.extract_features(X[id])
             if X_new is None:
@@ -73,7 +73,7 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
         x_new.append(np.max(deltas_bottom))
         x_new.append(np.min(deltas_bottom))
 
-        return list(x_new)
+        return x_new
 
     def extract_peaks_filtered(self, x):
         peaks_top = self.extract_peaks(x, True)
