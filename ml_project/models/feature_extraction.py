@@ -7,6 +7,11 @@ n_features = 18286
 
 
 class CardiogramFeatureExtractor():
+
+    def __init__(self, delta_rel=3, degree=1):
+        self.delta_rel = delta_rel
+        self.degree = degree
+
     def fit(self, X, y=None):
         X = check_array(X)
         return self
@@ -28,7 +33,7 @@ class CardiogramFeatureExtractor():
         x = np.trim_zeros(x)
 
         peaks_top, peaks_bottom = self.extract_peaks_filtered(x)
-        exit(0)
+        # exit(0)
 
         x_new = []
         x_new.append(self.extract_mean(x))
@@ -46,9 +51,27 @@ class CardiogramFeatureExtractor():
         deltas_top = self.extract_deltas(x, peaks_top, peaks_bottom)
         deltas_bottom = self.extract_deltas(x, peaks_bottom, peaks_top)
 
+        # Jump micro peaks for big peaks
+        # deltas_top = self.smooth_deltas(x, deltas_top)
+        # deltas_bottom = self.smooth_deltas(x, deltas_bottom)
+
+        # Delete peaks with very unequal jumps in both sides
+        deltas_top = [x for x in deltas_top if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
+        deltas_bottom = [x for x in deltas_bottom if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
+
+        # Compute mean "size" of peaks
+        delta_mean_top = sum([(x[1][0] + x[1][1])**self.degree for x in deltas_top])/len(deltas_top)
+        delta_mean_bottom = sum([(x[1][0] + x[1][1])**self.degree for x in deltas_bottom])/len(deltas_bottom)
+
+        # Filter peaks under mean size
+        peaks_top_filtered = [x for x in deltas_top if (x[1][0] + x[1][1])**self.degree >= delta_mean_top]
+        peaks_bottom_filtered = [x for x in deltas_bottom if (x[1][0] + x[1][1])**self.degree >= delta_mean_bottom]
+
         self.plot_peaks(x, False, np.array(peaks_top))
-        self.plot_peaks(x, False, np.array(peaks_top))
+        self.plot_peaks(x, False, np.array([x[0] for x in peaks_top_filtered]))
+
         self.plot_peaks(x, True, np.array(peaks_bottom))
+        self.plot_peaks(x, True, np.array([x[0] for x in peaks_bottom_filtered]))
 
         return (peaks_top, peaks_bottom)
 
@@ -87,9 +110,7 @@ class CardiogramFeatureExtractor():
             right = x[b[j]]
 
             delta = (a[i], (abs(center-left), abs(center-right)))
-            _, delta_left, delta_right = delta
-            if delta_right <= delta_left*2 and delta_left <= delta_right*2:
-                deltas.append(delta)
+            deltas.append(delta)
 
         return deltas
 
