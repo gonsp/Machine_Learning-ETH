@@ -2,11 +2,11 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_array
 
-n_elements = 6822
+# n_elements = 6822
 n_features = 18286
 
 
-class CardiogramFeatureExtractor():
+class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
 
     def __init__(self, delta_rel=3, degree=1):
         self.delta_rel = delta_rel
@@ -17,10 +17,13 @@ class CardiogramFeatureExtractor():
         return self
 
     def transform(self, X, y=None):
-        X = X.reshape(n_elements, n_features)
+        X = X.reshape(-1, n_features)
+        n_elements = X.shape[0]
+
         X_new = None
 
         for id in range(0, n_elements):
+            print("id: ", id)
             features = self.extract_features(X[id])
             if X_new is None:
                 X_new = np.zeros((n_elements, len(features)))
@@ -33,15 +36,26 @@ class CardiogramFeatureExtractor():
         x = np.trim_zeros(x)
 
         peaks_top, peaks_bottom = self.extract_peaks_filtered(x)
-        # exit(0)
+        period_top = self.extract_period(peaks_top)
+        period_bottom = self.extract_period(peaks_bottom)
 
         x_new = []
-        x_new.append(self.extract_mean(x))
-        x_new.append(self.extract_variance(x))
-        x_new.append(self.extract_min(x))
-        x_new.append(self.extract_max(x))
-        # x_new.append(self.extract_period(x))
-        # x_new.append(self.extract_max(x))
+        x_new.append(np.mean(x))
+        x_new.append(np.var(x))
+        x_new.append(np.max(x))
+        x_new.append(np.min(x))
+
+        x_new.append(np.mean(period_top))
+        x_new.append(np.var(period_top))
+        x_new.append(np.max(period_top))
+        x_new.append(np.min(period_top))
+        x_new.append(len(period_top))
+
+        x_new.append(np.mean(period_bottom))
+        x_new.append(np.var(period_bottom))
+        x_new.append(np.max(period_bottom))
+        x_new.append(np.min(period_bottom))
+        x_new.append(len(period_bottom))
         return list(x_new)
 
     def extract_peaks_filtered(self, x):
@@ -56,16 +70,16 @@ class CardiogramFeatureExtractor():
         # deltas_bottom = self.smooth_deltas(x, deltas_bottom)
 
         # Delete peaks with very unequal jumps in both sides
-        deltas_top = [x for x in deltas_top if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
-        deltas_bottom = [x for x in deltas_bottom if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
+        # deltas_top = [x for x in deltas_top if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
+        # deltas_bottom = [x for x in deltas_bottom if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
 
         # Compute mean "size" of peaks
         delta_mean_top = sum([(x[1][0] + x[1][1])**self.degree for x in deltas_top])/len(deltas_top)
         delta_mean_bottom = sum([(x[1][0] + x[1][1])**self.degree for x in deltas_bottom])/len(deltas_bottom)
 
         # Filter peaks under mean size
-        peaks_top_filtered = [x for x in deltas_top if (x[1][0] + x[1][1])**self.degree >= delta_mean_top]
-        peaks_bottom_filtered = [x for x in deltas_bottom if (x[1][0] + x[1][1])**self.degree >= delta_mean_bottom]
+        peaks_top_filtered = [x for x in deltas_top if (x[1][0] + x[1][1])**self.degree >= delta_mean_top*1.7]
+        peaks_bottom_filtered = [x for x in deltas_bottom if (x[1][0] + x[1][1])**self.degree >= delta_mean_bottom*1.7]
 
         self.plot_peaks(x, False, np.array(peaks_top))
         self.plot_peaks(x, False, np.array([x[0] for x in peaks_top_filtered]))
@@ -114,17 +128,13 @@ class CardiogramFeatureExtractor():
 
         return deltas
 
-    def extract_mean(self, x):
-        return np.mean(x)
+    def extract_period(self, peaks):
+        period = []
+        for i in range(0, len(peaks)-1):
+            period.append(peaks[i+1] - peaks[i])
 
-    def extract_variance(self, x):
-        return np.var(x)
+        return period
 
-    def extract_min(self, x):
-        return np.min(x)
-
-    def extract_max(self, x):
-        return np.max(x)
 
     def detect_peaks(self, x, mph=None, mpd=1, threshold=0, edge='rising',
                      kpsh=False, valley=False, show=False, ax=None):
