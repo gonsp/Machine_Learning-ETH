@@ -10,7 +10,7 @@ params:
       class: RandomForestClassifier
   param_grid:
     # CardiogramFeatureExtractor__delta_rel: [3]
-    RandomForestClassifier__n_estimators: [1000]
+    RandomForestClassifier__n_estimators: [2000]
   cv:
     module: sklearn.model_selection
     class: KFold

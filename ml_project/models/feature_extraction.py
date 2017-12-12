@@ -8,9 +8,10 @@ n_features = 18286
 
 class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
 
-    def __init__(self, delta_rel=3, degree=1):
+    def __init__(self, delta_rel=3, degree=1, window_size=100):
         self.delta_rel = delta_rel
         self.degree = degree
+        self.window_size = window_size
 
     def fit(self, X, y=None):
         X = check_array(X)
@@ -22,7 +23,7 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
 
         X_new = None
 
-        for id in range(0, n_elements):
+        for id in range(389, n_elements):
             print("id: ", id)
             features = self.extract_features(X[id])
             if X_new is None:
@@ -81,10 +82,6 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
         deltas_top = self.extract_deltas(x, peaks_top, peaks_bottom)
         deltas_bottom = self.extract_deltas(x, peaks_bottom, peaks_top)
 
-        # Jump micro peaks for big peaks
-        # deltas_top = self.smooth_deltas(x, deltas_top)
-        # deltas_bottom = self.smooth_deltas(x, deltas_bottom)
-
         # Delete peaks with very unequal jumps in both sides
         # deltas_top = [x for x in deltas_top if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
         # deltas_bottom = [x for x in deltas_bottom if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
@@ -98,13 +95,23 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
         peaks_bottom_delta_filtered = [p for p in deltas_bottom if (p[1][0] + p[1][1])**self.degree >= delta_mean_bottom]
 
         # Compute amplitude mean size
-        peak_mean_top = sum([x[p[0]] for p in peaks_top_delta_filtered])/len(peaks_top_delta_filtered)
-        peak_mean_bottom = sum([x[p[0]] for p in peaks_bottom_delta_filtered])/len(peaks_bottom_delta_filtered)
+        # peak_mean_top = sum([x[p[0]] for p in peaks_top_delta_filtered])/len(peaks_top_delta_filtered)
+        # peak_mean_bottom = sum([x[p[0]] for p in peaks_bottom_delta_filtered])/len(peaks_bottom_delta_filtered)
 
         # Filter peaks under amplitude mean size
-        peaks_top_filtered = [p for p in peaks_top_delta_filtered if True or x[p[0]] >= peak_mean_top]
-        peaks_bottom_filtered = [p for p in peaks_bottom_delta_filtered if True or x[p[0]] <= peak_mean_bottom]
+        # peaks_top_filtered = [p for p in peaks_top_delta_filtered if x[p[0]] >= peak_mean_top]
+        # peaks_bottom_filtered = [p for p in peaks_bottom_delta_filtered if x[p[0]] <= peak_mean_bottom]
 
+        def check_peak(comp, peak, peaks):
+            neighbors = [p for p in peaks if abs(peak[0] - p[0]) <= self.window_size]
+            return x[peak[0]] == comp([x[p[0]] for p in neighbors])
+
+        # Filter a peak if there is another higher non-filtered peak in its window
+        peaks_top_filtered = [p for p in peaks_top_delta_filtered if check_peak(max, p, peaks_top_delta_filtered)]
+        peaks_bottom_filtered = [p for p in peaks_bottom_delta_filtered if check_peak(min, p, peaks_bottom_delta_filtered)]
+
+        # peaks_top_filtered = peaks_top_delta_filtered
+        # peaks_bottom_filtered = peaks_bottom_delta_filtered
 
         # self.plot_peaks(x, False, np.array(peaks_top))
         # self.plot_peaks(x, False, np.array([p[0] for p in peaks_top_filtered]))
