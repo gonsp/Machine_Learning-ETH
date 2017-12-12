@@ -65,7 +65,7 @@ class CardiogramVisualizer(BaseEstimator, TransformerMixin):
 
         feature_extractor = CardiogramFeatureExtractor()
         feature_extractor.fit(X)
-        extracted_features = feature_extractor.transform(X)
+        # extracted_features = feature_extractor.transform(X)
 
         plt.ion()
         plt.show()
@@ -99,7 +99,7 @@ class CardiogramVisualizer(BaseEstimator, TransformerMixin):
                 plt.clf()
                 print("id:", id)
                 print("class: ", y[id])
-                print("features: ", extracted_features[id])
+                # print("features: ", extracted_features[id])
                 plt.plot(np.trim_zeros(X[id]))
                 plt.show()
                 plt.pause(0.001)
