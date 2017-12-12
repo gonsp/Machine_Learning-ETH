@@ -1,6 +1,6 @@
 import sys
 
-from ml_project.models.feature_extraction import CardiogramFeatureExtractor, n_elements, n_features
+from ml_project.models.feature_extraction import CardiogramFeatureExtractor, n_features
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -61,7 +61,7 @@ class CardiogramVisualizer(BaseEstimator, TransformerMixin):
         pass
 
     def fit(self, X, y):
-        X = X.reshape(n_elements, n_features)
+        X = X.reshape(-1, n_features)
 
         feature_extractor = CardiogramFeatureExtractor()
         feature_extractor.fit(X)

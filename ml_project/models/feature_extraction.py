@@ -35,7 +35,13 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
     def extract_features(self, x):
         x = np.trim_zeros(x)
 
-        peaks_top, peaks_bottom = self.extract_peaks_filtered(x)
+        peaks_deltas_top, peaks_deltas_bottom = self.extract_peaks_filtered(x)
+
+        peaks_top = [p[0] for p in peaks_deltas_top]
+        peaks_bottom = [p[0] for p in peaks_deltas_bottom]
+        deltas_top = [p[1][0] + p[1][1] for p in peaks_deltas_top]
+        deltas_bottom = [p[1][0] + p[1][1] for p in peaks_deltas_bottom]
+
         period_top = self.extract_period(peaks_top)
         period_bottom = self.extract_period(peaks_bottom)
 
@@ -44,18 +50,28 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
         x_new.append(np.var(x))
         x_new.append(np.max(x))
         x_new.append(np.min(x))
+        x_new.append(np.sum(x)/len(x))
 
+        x_new.append(len(peaks_top)/len(x))
         x_new.append(np.mean(period_top))
         x_new.append(np.var(period_top))
         x_new.append(np.max(period_top))
         x_new.append(np.min(period_top))
-        x_new.append(len(period_top))
+        x_new.append(np.mean(deltas_top))
+        x_new.append(np.var(deltas_top))
+        x_new.append(np.max(deltas_top))
+        x_new.append(np.min(deltas_top))
 
+        x_new.append(len(peaks_bottom)/len(x))
         x_new.append(np.mean(period_bottom))
         x_new.append(np.var(period_bottom))
         x_new.append(np.max(period_bottom))
         x_new.append(np.min(period_bottom))
-        x_new.append(len(period_bottom))
+        x_new.append(np.mean(deltas_bottom))
+        x_new.append(np.var(deltas_bottom))
+        x_new.append(np.max(deltas_bottom))
+        x_new.append(np.min(deltas_bottom))
+
         return list(x_new)
 
     def extract_peaks_filtered(self, x):
@@ -73,21 +89,30 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
         # deltas_top = [x for x in deltas_top if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
         # deltas_bottom = [x for x in deltas_bottom if x[1][0] <= x[1][1]*self.delta_rel and x[1][1] <= x[1][0]*self.delta_rel]
 
-        # Compute mean "size" of peaks
-        delta_mean_top = sum([(x[1][0] + x[1][1])**self.degree for x in deltas_top])/len(deltas_top)
-        delta_mean_bottom = sum([(x[1][0] + x[1][1])**self.degree for x in deltas_bottom])/len(deltas_bottom)
+        # Compute delta mean size of peaks
+        delta_mean_top = sum([(p[1][0] + p[1][1])**self.degree for p in deltas_top])/len(deltas_top)
+        delta_mean_bottom = sum([(p[1][0] + p[1][1])**self.degree for p in deltas_bottom])/len(deltas_bottom)
 
-        # Filter peaks under mean size
-        peaks_top_filtered = [x for x in deltas_top if (x[1][0] + x[1][1])**self.degree >= delta_mean_top*1.7]
-        peaks_bottom_filtered = [x for x in deltas_bottom if (x[1][0] + x[1][1])**self.degree >= delta_mean_bottom*1.7]
+        # Filter peaks under delta mean size
+        peaks_top_delta_filtered = [p for p in deltas_top if (p[1][0] + p[1][1])**self.degree >= delta_mean_top]
+        peaks_bottom_delta_filtered = [p for p in deltas_bottom if (p[1][0] + p[1][1])**self.degree >= delta_mean_bottom]
 
-        self.plot_peaks(x, False, np.array(peaks_top))
-        self.plot_peaks(x, False, np.array([x[0] for x in peaks_top_filtered]))
+        # Compute amplitude mean size
+        peak_mean_top = sum([x[p[0]] for p in peaks_top_delta_filtered])/len(peaks_top_delta_filtered)
+        peak_mean_bottom = sum([x[p[0]] for p in peaks_bottom_delta_filtered])/len(peaks_bottom_delta_filtered)
 
-        self.plot_peaks(x, True, np.array(peaks_bottom))
-        self.plot_peaks(x, True, np.array([x[0] for x in peaks_bottom_filtered]))
+        # Filter peaks under amplitude mean size
+        peaks_top_filtered = [p for p in peaks_top_delta_filtered if True or x[p[0]] >= peak_mean_top]
+        peaks_bottom_filtered = [p for p in peaks_bottom_delta_filtered if True or x[p[0]] <= peak_mean_bottom]
 
-        return (peaks_top, peaks_bottom)
+
+        # self.plot_peaks(x, False, np.array(peaks_top))
+        # self.plot_peaks(x, False, np.array([p[0] for p in peaks_top_filtered]))
+
+        # self.plot_peaks(x, True, np.array(peaks_bottom))
+        # self.plot_peaks(x, True, np.array([p[0] for p in peaks_bottom_filtered]))
+
+        return (peaks_top_filtered, peaks_bottom_filtered)
 
     def extract_peaks(self, x, top):
         peaks = self.detect_peaks(x, threshold=0, mph=None, mpd=0, edge='rising', kpsh=True, valley=not top, show=False)

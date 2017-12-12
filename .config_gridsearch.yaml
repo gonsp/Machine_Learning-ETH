@@ -1,0 +1,20 @@
+module: ml_project.model_selection
+class: GridSearchCV
+params:
+  est_module: ml_project.pipeline
+  est_class: Pipeline
+  est_params:
+    # - module: ml_project.models.feature_extraction
+    #   class: CardiogramFeatureExtractor
+    - module: sklearn.ensemble
+      class: RandomForestClassifier
+  param_grid:
+    # CardiogramFeatureExtractor__delta_rel: [3]
+    RandomForestClassifier__n_estimators: [1000]
+  cv:
+    module: sklearn.model_selection
+    class: KFold
+    params:
+      n_splits: 3
+      shuffle: True
+      random_state: 37
