@@ -107,11 +107,11 @@ class CardiogramFeatureExtractor(BaseEstimator, TransformerMixin):
             return x[peak[0]] == comp([x[p[0]] for p in neighbors])
 
         # Filter a peak if there is another higher non-filtered peak in its window
-        peaks_top_filtered = [p for p in peaks_top_delta_filtered if check_peak(max, p, peaks_top_delta_filtered)]
-        peaks_bottom_filtered = [p for p in peaks_bottom_delta_filtered if check_peak(min, p, peaks_bottom_delta_filtered)]
+        # peaks_top_filtered = [p for p in peaks_top_delta_filtered if check_peak(max, p, peaks_top_delta_filtered)]
+        # peaks_bottom_filtered = [p for p in peaks_bottom_delta_filtered if check_peak(min, p, peaks_bottom_delta_filtered)]
 
-        # peaks_top_filtered = peaks_top_delta_filtered
-        # peaks_bottom_filtered = peaks_bottom_delta_filtered
+        peaks_top_filtered = peaks_top_delta_filtered
+        peaks_bottom_filtered = peaks_bottom_delta_filtered
 
         # self.plot_peaks(x, False, np.array(peaks_top))
         # self.plot_peaks(x, False, np.array([p[0] for p in peaks_top_filtered]))
